@@ -10,5 +10,4 @@ MRuby::Gem::Specification.new('mruby-ipvs') do |spec|
   spec.add_test_dependency 'mruby-require'
   spec.add_test_dependency 'mruby-array-ext'
   spec.add_test_dependency 'mruby-hash-ext'
-  spec.add_test_dependency 'mruby-print'
 end
