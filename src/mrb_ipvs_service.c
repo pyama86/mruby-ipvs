@@ -47,9 +47,10 @@ static int parse_proto(const char *proto) {
 
 static mrb_value mrb_ipvs_service_init(mrb_state *mrb, mrb_value self) {
   int parse;
+  int argc;
   mrb_value arg_opt = mrb_nil_value(), addr = mrb_nil_value(),
             proto = mrb_nil_value(), sched_name = mrb_nil_value(),
-            obj = mrb_nil_value();
+            obj = mrb_nil_value(), read_dest = mrb_nil_value();
   // mrb_value arg_opt = mrb_nil_value(), addr = mrb_nil_value(),
   //           proto = mrb_nil_value(), sched_name = mrb_nil_value(),
   //           ops = mrb_nil_value(), obj = mrb_nil_value();
@@ -60,7 +61,10 @@ static mrb_value mrb_ipvs_service_init(mrb_state *mrb, mrb_value self) {
   ie = (struct mrb_ipvs_service *)mrb_malloc(mrb, sizeof(*ie));
   memset(ie, 0, sizeof(struct mrb_ipvs_service));
 
-  mrb_get_args(mrb, "H", &arg_opt);
+  argc = mrb_get_args(mrb, "H|o", &arg_opt, &read_dest);
+  if (argc == 1) {
+    read_dest = mrb_true_value();
+  }
 
   if (mrb_nil_p(arg_opt)) {
     mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid argument");
@@ -108,8 +112,10 @@ static mrb_value mrb_ipvs_service_init(mrb_state *mrb, mrb_value self) {
           IP_VS_SCHEDNAME_MAXLEN);
 
   mrb_data_init(self, ie, &mrb_ipvs_service_type);
-  mrb_update_service_dests(mrb, self, NULL);
 
+  if (mrb_bool(read_dest)) {
+    mrb_update_service_dests(mrb, self, NULL);
+  }
   return self;
 }
 
@@ -282,7 +288,7 @@ void mrb_ipvs_service_class_init(mrb_state *mrb, struct RClass *_class_ipvs) {
       mrb_define_class_under(mrb, _class_ipvs, "Service", mrb->object_class);
   MRB_SET_INSTANCE_TT(_class_ipvs_service, MRB_TT_DATA);
   mrb_define_method(mrb, _class_ipvs_service, "initialize",
-                    mrb_ipvs_service_init, MRB_ARGS_REQ(1));
+                    mrb_ipvs_service_init, MRB_ARGS_ARG(1, 1));
   mrb_define_method(mrb, _class_ipvs_service, "initialize_copy",
                     mrb_ipvs_service_init_copy,
                     MRB_ARGS_REQ(1) | MRB_ARGS_OPT(6));
