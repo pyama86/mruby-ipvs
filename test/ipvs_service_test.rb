@@ -20,6 +20,19 @@ assert('IPVS::Service.new({"addr" => "10.0.0.1", "sched_name" => "rr"}') do
   ipvs.sched_name == "rr"
 end
 
+assert('IPVS::Service.new({"addr" => "10.0.0.1", "dests" => {"addr" => "192.168.0.1", "weight" => 256, "port" => 80, "conn" => "dr"}') do
+  ipvs = IPVS::Service.new({
+    "addr" => "10.0.0.1",
+    "dests" => [IPVS::Dest.new({"addr" => "192.168.0.1", "weight" => 256, "port" => 80, "conn" => "dr"})]
+  })
+  dest = ipvs.dests.first
+  assert_equal(1, ipvs.dests.length)
+  assert_equal("192.168.0.1", dest.addr)
+  assert_equal(80, dest.port)
+  assert_equal(256, dest.weight)
+  assert_equal("DR", dest.conn)
+end
+
 assert('IPVS::Service#dests') do
   add_service_with do |s,d|
     dests = s[0].dests

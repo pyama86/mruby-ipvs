@@ -49,7 +49,7 @@ static mrb_value mrb_ipvs_service_init(mrb_state *mrb, mrb_value self) {
   int parse;
   mrb_value arg_opt = mrb_nil_value(), addr = mrb_nil_value(),
             proto = mrb_nil_value(), sched_name = mrb_nil_value(),
-            obj = mrb_nil_value();
+            obj = mrb_nil_value(), dests = mrb_nil_value();
   // mrb_value arg_opt = mrb_nil_value(), addr = mrb_nil_value(),
   //           proto = mrb_nil_value(), sched_name = mrb_nil_value(),
   //           ops = mrb_nil_value(), obj = mrb_nil_value();
@@ -108,7 +108,14 @@ static mrb_value mrb_ipvs_service_init(mrb_state *mrb, mrb_value self) {
           IP_VS_SCHEDNAME_MAXLEN);
 
   mrb_data_init(self, ie, &mrb_ipvs_service_type);
-  mrb_update_service_dests(mrb, self, NULL);
+
+
+  dests = mrb_hash_get(mrb, arg_opt, mrb_str_new_cstr(mrb, "dests"));
+  if (mrb_nil_p(dests)) {
+    mrb_update_service_dests(mrb, self, NULL);
+  } else {
+    mrb_iv_set(mrb, self, mrb_intern_lit(mrb, "@dests"), dests);
+  }
 
   return self;
 }

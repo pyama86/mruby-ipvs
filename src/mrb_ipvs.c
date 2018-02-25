@@ -93,6 +93,8 @@ static mrb_value mrb_ipvs_services(mrb_state *mrb, mrb_value self)
     mrb_hash_set(mrb, h, mrb_str_new_cstr(mrb, "port"), mrb_fixnum_value(ntohs(se->port)));
     mrb_hash_set(mrb, h, mrb_str_new_cstr(mrb, "sched_name"),
                  mrb_str_new_cstr(mrb, se->sched_name));
+    mrb_hash_set(mrb, h, mrb_str_new_cstr(mrb, "dests"),
+                 mrb_str_new_cstr(mrb, "dummy"));
     service = mrb_obj_new(mrb, mrb_class_get_under(mrb, mrb_class_get(mrb, "IPVS"), "Service"), 1, &h);
     mrb_update_service_dests(mrb, service, get);
     mrb_ary_push(mrb, services, service);
