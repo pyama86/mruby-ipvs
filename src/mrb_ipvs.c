@@ -69,7 +69,6 @@ static mrb_value mrb_ipvs_services(mrb_state *mrb, mrb_value self)
 {
   struct ip_vs_get_services *get;
   char pbuf[INET6_ADDRSTRLEN];
-  mrb_value argv[2];
   int i;
   ipvs_service_entry_t *se;
   mrb_value services, service, h;
@@ -94,10 +93,7 @@ static mrb_value mrb_ipvs_services(mrb_state *mrb, mrb_value self)
     mrb_hash_set(mrb, h, mrb_str_new_cstr(mrb, "port"), mrb_fixnum_value(ntohs(se->port)));
     mrb_hash_set(mrb, h, mrb_str_new_cstr(mrb, "sched_name"),
                  mrb_str_new_cstr(mrb, se->sched_name));
-
-    argv[0] = h;
-    argv[1] = mrb_false_value();
-    service = mrb_obj_new(mrb, mrb_class_get_under(mrb, mrb_class_get(mrb, "IPVS"), "Service"), 2, argv);
+    service = mrb_obj_new(mrb, mrb_class_get_under(mrb, mrb_class_get(mrb, "IPVS"), "Service"), 1, &h);
     mrb_update_service_dests(mrb, service, get);
     mrb_ary_push(mrb, services, service);
   }
